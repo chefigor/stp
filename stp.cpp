@@ -1,5 +1,5 @@
-#include "caf/all.hpp"
 #include <iostream>
+#include "caf/all.hpp"
 
 using namespace caf;
 
@@ -11,89 +11,79 @@ CAF_BEGIN_TYPE_ID_BLOCK(my_project, caf::first_custom_type_id)
 CAF_END_TYPE_ID_BLOCK(my_project)
 
 using switch_type = typed_actor<
-  //result<void>(add_atom, uint32_t, uint32_t), result<void>(put_atom, uint32_t),
-  result<uint32_t>(get_atom), result<void>(link_atom, strong_actor_ptr),
-  result<void>(advertise_atom, uint32_t), result<void>(broadcast_atom)>;
+  result<uint32_t>(get_atom), 
+  result<void>(link_atom, strong_actor_ptr,uint32_t),
+  result<void>(advertise_atom, uint32_t), 
+  result<void>(broadcast_atom)>;
 
-class nswitch : public switch_type::base {
+class network_switch : public switch_type::base {
 public:
-  explicit nswitch(actor_config& cfg, uint32_t bridge_id)
-    : switch_type::base(cfg), m_bridgeid(bridge_id), m_rootid(bridge_id) {
+  explicit network_switch(actor_config& cfg, uint32_t bridge_id,uint32_t helloTimer)
+    : switch_type::base(cfg), m_bridgeId(bridge_id), m_rootId(bridge_id), m_helloTimer(helloTimer) {
   }
 
   switch_type::pointer self;
 
+  void on_exit() override{
+    for (auto& [port,sw] : table)
+      destroy(sw);
+  }
 protected:
   behavior_type make_behavior() override {
     return {
-      // [=](add_atom, uint32_t val, uint32_t val2) {},
-      // [=](put_atom, uint32_t val) { m_bridgeid = val; },
-      [=](get_atom) { return m_bridgeid; },
-      [=](link_atom, strong_actor_ptr sw) {
-        table.insert(actor_cast<switch_type>(sw));
-        // request(actor_cast<switch_type>(sw), std::chrono::seconds(10),
-        //         get_atom_v)
-        //   .then(
-        //     [&](uint32_t add) {
-        //       aout(this) << "switch 1 mac address " << add << std::endl;
-        //     },
-        //     [&](const error&) {});
-
-        //delayed_send(this, std::chrono::milliseconds(1), broadcast_atom_v);
+      [=](get_atom) { return m_bridgeId; },
+      [=](link_atom, strong_actor_ptr sw,uint32_t port) {
+        table.insert(std::make_pair( port,actor_cast<switch_type>(sw)));
       },
-      [=](advertise_atom, uint32_t rootid) {
-        aout(this) << "advertised to  " << m_bridgeid << " " << rootid
+      [=](advertise_atom, uint32_t rootId) {
+        aout(this) << "advertised to  " << m_bridgeId << " " << rootId
                    << std::endl;
-
-        if (m_rootid > rootid)
-          m_rootid = rootid;
+        if (m_rootId > rootId)
+          m_rootId = rootId;
       },
       [=](broadcast_atom) {
+        aout(this)<<"Switch : "<< m_bridgeId<<" is broadcasting " << m_rootId<<std::endl;
         for (auto& sw : table) {
-          request(sw, std::chrono::seconds(10), advertise_atom_v, m_rootid);
-
-          // request(sw, std::chrono::seconds(10), get_atom_v)
-          //   .then(
-          //     [&](uint32_t add) {
-          //       aout(this) << "switch 1 mac address " << add << std::endl;
-          //     },
-          //     [&](const error&) {});
+          request(sw.second, std::chrono::seconds(10), advertise_atom_v, m_rootId);
         }
-        delayed_send(this, std::chrono::seconds(10), broadcast_atom_v);
+        delayed_send(this, std::chrono::seconds(m_helloTimer), broadcast_atom_v);
       }};
   }
 
 private:
-  uint32_t m_bridgeid;
-  uint32_t m_rootid;
-  std::set<switch_type> table;
+  uint32_t m_bridgeId;
+  uint32_t m_rootId;
+  uint32_t m_helloTimer;
+  std::map<uint32_t,switch_type> table;
 };
 
 void caf_main(actor_system& sys) {
-  auto sw1 = sys.spawn<nswitch>(1u);
-  auto sw2 = sys.spawn<nswitch>(2u);
-  auto sw3 = sys.spawn<nswitch>(3u);
-  auto sw4 = sys.spawn<nswitch>(4u);
-  auto sw5 = sys.spawn<nswitch>(5u);
-  auto sw6 = sys.spawn<nswitch>(6u);
+  auto sw1 = sys.spawn<network_switch>(7u,5u);
+  auto sw2 = sys.spawn<network_switch>(2u,10u);
+  auto sw3 = sys.spawn<network_switch>(3u,10u);
+  auto sw4 = sys.spawn<network_switch>(4u,10u);
+  auto sw5 = sys.spawn<network_switch>(1u,5u);
+  auto sw6 = sys.spawn<network_switch>(6u,5u);
   scoped_actor self{sys};
+  
+  //std::cout<<to_string(sw1)<<std::endl;
+  //std::cout<<to_string(self)<<std::endl;
 
   // self->request(sw1, infinite, advertise_atom_v, 2u);
-  self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw2));
-  self->request(sw2, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1));
+  self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw2),1u);
+  self->request(sw2, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1),1u);
 
-  self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw3));
-  self->request(sw3, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1));
+  self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw3),2u);
+  self->request(sw3, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1),1u);
 
-  self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw4));
-  self->request(sw4, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1));
+  self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw4),3u);
+  self->request(sw4, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1),1u);
 
-  self->request(sw4, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw5));
-  self->request(sw5, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw4));
+  self->request(sw4, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw5),2u);
+  self->request(sw5, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw4),1u);
 
-  self->request(sw4, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw6));
-  self->request(sw6, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw4));
-  //
+  self->request(sw4, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw6),3u);
+  self->request(sw6, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw4),1u);
 
   self->request(sw2, infinite, broadcast_atom_v);
   self->request(sw3, infinite, broadcast_atom_v);
@@ -102,9 +92,7 @@ void caf_main(actor_system& sys) {
   self->request(sw6, infinite, broadcast_atom_v);
   self->request(sw1, infinite, broadcast_atom_v);
 
-  sys.registry();
-  while (true)
-    ;
+  ///self->send_exit(sw1,exit_reason::user_shutdown);
 }
 
 CAF_MAIN(id_block::my_project)
