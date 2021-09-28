@@ -1,3 +1,4 @@
+#include <atomic>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -5,8 +6,11 @@
 #include <thread>
 #include <vector>
 
-struct uint48{
-  uint64_t x:48;
+std::atomic<int> done_switches(0);
+uint32_t switchCount = 6;
+uint32_t minRootId = 1;
+struct uint48 {
+  uint64_t x : 48;
 };
 class Switch {
  public:
@@ -16,9 +20,10 @@ class Switch {
     b.neighbors.push_back(&a);
   }
   void start() {
-    while (true) {
+    bool increment = false;
+    while (done_switches.load() != switchCount) {
       for (auto a : neighbors) {
-        std::scoped_lock<std::mutex,std::mutex> lock(a->mutex, this->mutex);
+        std::scoped_lock<std::mutex, std::mutex> lock(a->mutex, this->mutex);
         if (a->root_id < this->root_id) this->root_id = a->root_id;
 
         std::stringstream ss;
@@ -28,7 +33,11 @@ class Switch {
 
         std::cout << ss.str();
       }
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+      if (this->root_id == minRootId && !increment) {
+        done_switches.fetch_add(1, std::memory_order_acquire);
+        increment = true;
+      }
+      std::this_thread::sleep_for(std::chrono::seconds(2));
     }
   }
 
@@ -45,27 +54,30 @@ int main() {
   Switch c(3);
   Switch d(4);
   Switch e(5);
+  Switch f(6);
   link(a, b);
   link(a, c);
   link(b, d);
   link(b, e);
   link(e, d);
+  link(e,f);
   /*
                 |-------SW4
     SW3--SW1--SW2        |
-                |-------SW5
+                |-------SW5----SW6
   */
   std::thread s1(&Switch::start, &a);
   std::thread s2(&Switch::start, &b);
   std::thread s3(&Switch::start, &c);
   std::thread s4(&Switch::start, &d);
   std::thread s5(&Switch::start, &e);
+  std::thread s6(&Switch::start, &f);
 
   s1.join();
   s2.join();
   s3.join();
   s4.join();
   s5.join();
-
+  s6.join();
   return 0;
 }
