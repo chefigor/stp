@@ -44,8 +44,8 @@ class Switch {
         for (std::size_t i = 0; i != count; ++i) {
           if (neighbors[i] < root_id) root_id = neighbors[i];
           std::stringstream ss;
-          ss << "Switch#" << bridge_id << " received rootID "
-             << neighbors[i] << std::endl;
+          ss << "Switch#" << bridge_id << " received rootID " << neighbors[i]
+             << " :: value of rootID = " << root_id << std::endl;
           std::cout << ss.str();
         }
       }
