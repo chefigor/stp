@@ -8,3 +8,9 @@ target_link_libraries(stp PRIVATE CAF::internal CAF::core)
 # libcaf_io
 # libcaf_core
 # )
+add_executable(stp_c stp_c.cpp)
+target_link_libraries(stp_c PRIVATE pthread)
+set_property(TARGET stp_c PROPERTY CXX_STANDARD 17)
+
+add_executable(stp_concurrent stp_concurrent.cpp)
+target_link_libraries(stp_concurrent PRIVATE pthread)
