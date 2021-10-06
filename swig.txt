@@ -1,0 +1,17 @@
+swig -python example.i
+//locate Python.h
+gcc -fPIC -c example.c example_wrap.c -I/usr/include/python3.8
+gcc -shared example.o example_wrap.o -o _example.so
+
+swig -python -I. -c++ -outdir . -o examplePYTHON_wrap.cxx example.i
+c++ -fPIC -std=c++17 -c example.c examplePYTHON_wrap.cxx -isystem /usr/include/python3.8
+c++ -dynamiclib example.o examplePYTHON_wrap.o /usr/lib/x86_64-linux-gnu/libpython3.8.so  -o _example.so
+
+// int fact(int n);
+// //double Foo;
+// #define SPAM 42
+
+-----------------------------------------------------------------------------------------------------------------
+swig -python -c++ -outdir . src/stp_c.i 
+g++ -std=c++17 -Isrc -fPIC -c src/stp_c.cpp src/stp_c_wrap.cxx -I/usr/include/python3.9 -pthread
+g++ -std=c++17 -shared -fPIC -o _stp.so stp_c.o stp_c_wrap.o -pthread 
