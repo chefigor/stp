@@ -4,3 +4,5 @@ bin
 .debug_time
 *.o
 *.out
+*.so
+__pycache__

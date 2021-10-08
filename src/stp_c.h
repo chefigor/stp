@@ -23,6 +23,7 @@ class Switch;
 struct Link {
   Switch* sw;
   uint32_t cost;
+  Link()=default;
   Link(Switch* sw, uint32_t cost) : sw(sw), cost(cost) {}
 };
 class Switch {
