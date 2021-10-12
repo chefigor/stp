@@ -1,0 +1,5 @@
+add_executable(stp_caf src/stp_caf.cpp)
+find_package(CAF REQUIRED)
+target_link_libraries(stp_caf PRIVATE  CAF::core) # CAF::internal
+target_compile_options(stp_caf PRIVATE -Werror -Wall -Wextra)
+target_compile_features(stp_caf PRIVATE cxx_std_17)

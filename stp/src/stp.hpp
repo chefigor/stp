@@ -1,6 +1,3 @@
-#ifndef STP_C_H_
-#define STP_C_H_
-
 #include <algorithm>
 #include <atomic>
 #include <cstdint>
@@ -35,10 +32,10 @@ class Switch {
   void stopSwitch();
  public:
   uint32_t messages = 0;
-  uint32_t root_cost;
-  uint64_t root_path;
-  uint64_t root_id;
   uint64_t bridge_id;
+  uint64_t root_id;
+  uint64_t root_path;
+  uint32_t root_cost;
   std::vector<Link> neighbors;
   std::thread* th;
   bool terminate;
@@ -48,5 +45,3 @@ class Switch {
 };
 int test();
 uint64_t convert_mac(std::string);
-
-#endif

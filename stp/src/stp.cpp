@@ -1,12 +1,12 @@
-#include "stp_c.h"
+#include "stp.hpp"
 bool a = true;
 uint64_t convert_mac(std::string mac) {
   mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
   return strtoul(mac.c_str(), NULL, 16);
 }
 Switch::Switch(uint32_t bridgeId)
-    : root_id(bridgeId),
-      bridge_id(bridgeId),
+    : bridge_id(bridgeId),
+      root_id(bridgeId),
       root_path(bridgeId),
       root_cost(0) {}
 

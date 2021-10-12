@@ -1,16 +1,9 @@
-cmake_minimum_required(VERSION 3.0.0)
-project(STP VERSION 0.1.0)
+cmake_minimum_required(VERSION 3.2.0)
+project(STP VERSION 1.0.0 LANGUAGES CXX)
 
-add_executable(stp stp.cpp)
-find_package(CAF REQUIRED)
-target_link_libraries(stp PRIVATE CAF::internal CAF::core)
-# target_link_libraries(stp
-# libcaf_io
-# libcaf_core
-# )
-add_executable(stp_c stp_c.cpp)
-target_link_libraries(stp_c PRIVATE pthread)
-set_property(TARGET stp_c PROPERTY CXX_STANDARD 17)
+cmake_policy(SET CMP0078 NEW)
+cmake_policy(SET CMP0086 NEW)
 
-add_executable(stp_concurrent stp_concurrent.cpp)
-target_link_libraries(stp_concurrent PRIVATE pthread)
+add_subdirectory(stp_caf)
+add_subdirectory(stp_concurrent)
+add_subdirectory(stp)

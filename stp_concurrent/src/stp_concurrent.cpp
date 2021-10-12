@@ -2,7 +2,7 @@
 #include <sstream>
 #include <vector>
 
-#include "concurrentqueue.h"
+#include "concurrentqueue.hpp"
 using queue = moodycamel::ConcurrentQueue<int>;
 
 class Switch {
@@ -38,7 +38,7 @@ class Switch {
       //      << neighbors[count - 1] << std::endl;
       //   std::cout << ss.str();
       // }
-      int neighbors[20];
+      uint32_t neighbors[20];
       std::size_t count;
       while ((count = recvQ->try_dequeue_bulk(neighbors, 20)) != 0) {
         for (std::size_t i = 0; i != count; ++i) {

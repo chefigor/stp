@@ -1,5 +1,5 @@
 import unittest
-from stp_c import *
+from stp import *
 import time
 
 
