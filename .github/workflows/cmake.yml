@@ -29,7 +29,7 @@ jobs:
         cd actor-framework/
         ./configure
         cd build
-        make
+        make -j
         make test 
       
     - name: Configure CMake
@@ -39,7 +39,7 @@ jobs:
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=./actor-framework/build
 
     - name: Test
       working-directory: ${{github.workspace}}/build
