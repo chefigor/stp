@@ -29,7 +29,7 @@ jobs:
         cd actor-framework/
         ./configure
         cd build
-        make -j
+        make -j 8
         make test 
       
     - name: Configure CMake
