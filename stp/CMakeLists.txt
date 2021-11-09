@@ -13,3 +13,11 @@ add_library(lib_stp SHARED src/stp.cpp)
 target_compile_options(lib_stp PRIVATE -Werror -Wall -Wextra)
 target_compile_features(lib_stp PRIVATE cxx_std_17)
 swig_link_libraries(stp lib_stp)
+
+find_package(Python REQUIRED)
+add_test (NAME python-tests
+  COMMAND  ${Python_EXECUTABLE} -m unittest   
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test
+)
+set_tests_properties(python-tests
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{PYTHONPATH}")
