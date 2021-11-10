@@ -14,33 +14,37 @@ Switch::Switch(uint32_t bridgeId)
 Switch::Switch(const std::string& mac) : Switch(convert_mac(mac)) {}
 Switch::Switch(std::string&& mac) : Switch(convert_mac(std::move(mac))) {}
 
-void link(Switch& a, Switch& b, uint32_t cost) {
-  a.neighbors.emplace_back(&b, cost);
-  b.neighbors.emplace_back(&a, cost);
+void link(const std::shared_ptr<Switch>& a, const std::shared_ptr<Switch> b,
+          uint32_t cost) {
+  a->neighbors.emplace_back(b, cost);
+  b->neighbors.emplace_back(a, cost);
 }
 
 void Switch::start() {
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_int_distribution<uint> dist(0, 15);
-  uint hello_timer= dist(mt);
+  uint hello_timer = dist(mt);
   while (!terminate.load()) {
-    for (auto a : neighbors) {
-      std::scoped_lock<std::mutex, std::mutex> lock(a.sw->mutex, this->mutex);
-      messages++;
-      if (a.sw->root_id < this->root_id) {
-        this->root_id = a.sw->root_id;
-        this->root_path = a.sw->bridge_id;
-        this->root_cost = a.sw->root_cost + a.cost;
-      } else if (a.sw->root_id == this->root_id &&
-                 this->root_cost > a.sw->root_cost + a.cost) {
-        this->root_path = a.sw->bridge_id;
-        this->root_cost = a.sw->root_cost + a.cost;
+    for (auto& a : neighbors) {
+      auto neighbor = a.sw.lock();
+      if (!neighbor) continue;
+      std::scoped_lock<std::mutex, std::mutex> lock(neighbor->mutex,
+                                                    this->mutex);
+      ++messages;
+      if (neighbor->root_id < this->root_id) {
+        this->root_id = neighbor->root_id;
+        this->root_path = neighbor->bridge_id;
+        this->root_cost = neighbor->root_cost + a.cost;
+      } else if (neighbor->root_id == this->root_id &&
+                 this->root_cost > neighbor->root_cost + a.cost) {
+        this->root_path = neighbor->bridge_id;
+        this->root_cost = neighbor->root_cost + a.cost;
       }
 
       std::stringstream ss;
-      ss << "Switch#" << this->bridge_id << " received rootID " << a.sw->root_id
-         << " from Switch#" << a.sw->bridge_id
+      ss << "Switch#" << this->bridge_id << " received rootID "
+         << neighbor->root_id << " from Switch#" << neighbor->bridge_id
          << " :: value of rootID = " << this->root_id << " , Root path = Switch"
          << this->root_path << std::endl;
 
@@ -59,6 +63,19 @@ void Switch::stopSwitch() {
   terminate.store(true);
   th.join();
 }
+
+uint64_t Switch::getBridgeId() const { return bridge_id; }
+uint64_t Switch::getRootId() const { return root_id; }
+uint64_t Switch::getRootPath() const { return root_path; }
+uint32_t Switch::getRootCost() const { return root_cost; }
+std::vector<std::weak_ptr<Switch>> Switch::getNeighbors() const {
+  std::vector<std::weak_ptr<Switch>> s;
+  for (auto sw : neighbors) {
+    s.push_back(sw.sw);
+  }
+  return s;
+}
+
 int main() { test(); }
 
 int test() {
@@ -68,13 +85,12 @@ int test() {
             4            4   |-------SW5(e)------|
                                 62          62
   */
-  std::string h{"00:00:00:00:00:01"};
-  Switch a(h);
-  Switch b("00:00:00:00:00:02");
-  Switch d("00:00:00:00:00:04");
-  Switch e("00:00:00:00:00:05");
-  Switch c("00:00:00:00:00:03");
-  Switch f("00:00:00:00:00:10");
+  auto a = std::make_shared<Switch>("00:00:00:00:00:01");
+  auto b = std::make_shared<Switch>("00:00:00:00:00:02");
+  auto c = std::make_shared<Switch>("00:00:00:00:00:03");
+  auto d = std::make_shared<Switch>("00:00:00:00:00:04");
+  auto e = std::make_shared<Switch>("00:00:00:00:00:05");
+  auto f = std::make_shared<Switch>("00:00:00:00:00:10");
 
   link(a, b, LINK1000);
   link(a, c, LINK1000);
@@ -84,21 +100,21 @@ int test() {
   link(e, f, LINK16);
   link(d, f, LINK16);
 
-  a.startSwitch();
-  b.startSwitch();
-  c.startSwitch();
-  d.startSwitch();
-  e.startSwitch();
-  f.startSwitch();
+  a->startSwitch();
+  b->startSwitch();
+  c->startSwitch();
+  d->startSwitch();
+  e->startSwitch();
+  f->startSwitch();
 
   std::this_thread::sleep_for(std::chrono::seconds(10));
 
-  a.stopSwitch();
-  b.stopSwitch();
-  c.stopSwitch();
-  d.stopSwitch();
-  e.stopSwitch();
-  f.stopSwitch();
+  a->stopSwitch();
+  b->stopSwitch();
+  c->stopSwitch();
+  d->stopSwitch();
+  e->stopSwitch();
+  f->stopSwitch();
 
   // std::cout << "Root paths : " << std::endl;
   // std::cout << "Switch#" << a.bridge_id << " root path Switch#" <<

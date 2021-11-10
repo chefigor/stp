@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <atomic>
-#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -16,22 +15,33 @@ static constexpr uint32_t LINK100 = 19;
 static constexpr uint32_t LINK1000 = 4;
 static constexpr uint32_t LINK10000 = 2;
 
-class Switch;
-struct Link {
-  Switch* sw;
-  uint32_t cost;
-  Link() = default;
-  Link(Switch* sw, uint32_t cost) : sw(sw), cost(cost) {}
-};
+uint64_t convert_mac(std::string);
+
 class Switch {
+
+ private:
+  struct Link {
+    std::weak_ptr<Switch> sw;
+    uint32_t cost;
+    Link() = default;
+    Link(const std::weak_ptr<Switch>& sw, uint32_t cost) : sw(sw), cost(cost) {}
+  };
+
  public:
   Switch(uint32_t bridgeId);
   Switch(const std::string& mac);
   Switch(std::string&& mac);
-  friend void link(Switch& a, Switch& b, uint32_t cost);
+  friend void link(const std::shared_ptr<Switch>& a,
+                   const std::shared_ptr<Switch> b, uint32_t cost);
   void start();
   void startSwitch();
   void stopSwitch();
+
+  uint64_t getBridgeId() const;
+  uint64_t getRootId() const;
+  uint64_t getRootPath() const;
+  uint32_t getRootCost() const;
+  std::vector<std::weak_ptr<Switch>> getNeighbors() const;
 
  private:
   uint32_t messages = 0;
@@ -45,5 +55,4 @@ class Switch {
   std::mutex mutex;
 };
 
-uint64_t convert_mac(std::string);
 int test();

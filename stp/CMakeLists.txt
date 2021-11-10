@@ -21,3 +21,4 @@ add_test (NAME python-tests
 )
 set_tests_properties(python-tests
     PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{PYTHONPATH}")
+    
