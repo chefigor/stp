@@ -13,9 +13,9 @@ class TestBasic(unittest.TestCase):
                4            4   |-------SW5(e)------|
                                    62          62
         """
-      
+
         self.Switch = []
-        
+
         self.Switch.append(Switch("00:00:00:00:00:01"))
         self.Switch.append(Switch("00:00:00:00:00:02"))
         self.Switch.append(Switch("00:00:00:00:00:03"))
@@ -39,9 +39,8 @@ class TestBasic(unittest.TestCase):
             x.stopSwitch()
         for x in self.Switch:
             self.assertEqual(x.getRootId(), 1)
-        self.assertEqual(self.Switch[5].getRootPath(),self.Switch[3].getBridgeId())
-        self.assertEqual(self.Switch[5].getRootCost(),LINK16+LINK100+LINK1000)
-
+        self.assertEqual(self.Switch[5].getRootPath(), self.Switch[3].getBridgeId())
+        self.assertEqual(self.Switch[5].getRootCost(), LINK16 + LINK100 + LINK1000)
 
     def test_switch(self):
         a = Switch(5)
@@ -60,11 +59,11 @@ class TestBasic(unittest.TestCase):
         bt = False
         print(b.getNeighbors())
         for tmp in b.getNeighbors():
-            x=tmp.lock()
+            x = tmp.lock()
             if a.getBridgeId() == x.getBridgeId():
                 at = True
         for tmp in a.getNeighbors():
-            x=tmp.lock();
+            x = tmp.lock()
             if b.getBridgeId() == x.getBridgeId():
                 bt = True
         self.assertTrue(at)
