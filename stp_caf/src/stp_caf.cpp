@@ -65,11 +65,7 @@ void caf_main(actor_system& sys) {
   auto sw5 = sys.spawn<network_switch>(1u,5u);
   auto sw6 = sys.spawn<network_switch>(6u,5u);
   scoped_actor self{sys};
-  
-  //std::cout<<to_string(sw1)<<std::endl;
-  //std::cout<<to_string(self)<<std::endl;
 
-  // self->request(sw1, infinite, advertise_atom_v, 2u);
   self->request(sw1, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw2),1u);
   self->request(sw2, infinite, link_atom_v, actor_cast<strong_actor_ptr>(sw1),1u);
 
@@ -91,8 +87,6 @@ void caf_main(actor_system& sys) {
   self->request(sw5, infinite, broadcast_atom_v);
   self->request(sw6, infinite, broadcast_atom_v);
   self->request(sw1, infinite, broadcast_atom_v);
-
-  ///self->send_exit(sw1,exit_reason::user_shutdown);
 }
 
 CAF_MAIN(id_block::my_project)
