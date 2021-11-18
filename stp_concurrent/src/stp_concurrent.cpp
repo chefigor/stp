@@ -12,9 +12,9 @@ void Switch::start() {
     for (auto a : sendQ) {
       a->enqueue(root_id);
     }
-    uint32_t neighbors[20];
+    std::array<uint32_t,20> neighbors;
     std::size_t count;
-    while ((count = recvQ->try_dequeue_bulk(neighbors, 20)) != 0) {
+    while ((count = recvQ->try_dequeue_bulk(neighbors.data(), 20)) != 0) {
       for (std::size_t i = 0; i != count; ++i) {
         if (neighbors[i] < root_id) root_id = neighbors[i];
         std::stringstream ss;
