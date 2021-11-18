@@ -18,32 +18,28 @@ static constexpr uint32_t LINK10000 = 2;
 uint64_t convert_mac(std::string);
 
 class Switch {
+ public:
+  Switch(uint32_t bridgeId);
+  Switch(const std::string& mac);
+  Switch(std::string&& mac);
+  uint64_t getBridgeId() const;
+  uint64_t getRootId() const;
+  uint64_t getRootPath() const;
+  uint32_t getRootCost() const;
+  std::vector<std::weak_ptr<Switch>> getNeighbors() const;
+  friend void link(const std::shared_ptr<Switch>& a,
+                   const std::shared_ptr<Switch> b, uint32_t cost);
+  void startSwitch();
+  void stopSwitch();
 
  private:
+  void start();
   struct Link {
     std::weak_ptr<Switch> sw;
     uint32_t cost;
     Link() = default;
     Link(const std::weak_ptr<Switch>& sw, uint32_t cost) : sw(sw), cost(cost) {}
   };
-
- public:
-  Switch(uint32_t bridgeId);
-  Switch(const std::string& mac);
-  Switch(std::string&& mac);
-  friend void link(const std::shared_ptr<Switch>& a,
-                   const std::shared_ptr<Switch> b, uint32_t cost);
-  void start();
-  void startSwitch();
-  void stopSwitch();
-
-  uint64_t getBridgeId() const;
-  uint64_t getRootId() const;
-  uint64_t getRootPath() const;
-  uint32_t getRootCost() const;
-  std::vector<std::weak_ptr<Switch>> getNeighbors() const;
-
- private:
   uint32_t messages = 0;
   uint64_t bridge_id;
   uint64_t root_id;
@@ -54,5 +50,3 @@ class Switch {
   std::atomic_bool terminate{false};
   std::mutex mutex;
 };
-
-int test();
