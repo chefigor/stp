@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-#include "concurrentqueue.hpp"
+#include "moodycamel/concurrentqueue.hpp"
 #include "spdlog/spdlog.h"
 using queue = moodycamel::ConcurrentQueue<uint32_t>;
 
