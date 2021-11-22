@@ -1,4 +1,5 @@
 add_executable(stp_concurrent src/stp_concurrent.cpp)
+target_include_directories(stp_concurrent PRIVATE include)
 target_link_libraries(stp_concurrent PRIVATE pthread)
 target_link_libraries(stp_concurrent PRIVATE spdlog::spdlog_header_only)
 target_compile_options(stp_concurrent PRIVATE -Werror -Wall -Wextra)
