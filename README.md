@@ -1,11 +1,22 @@
-# stp
+# STP
 
-build.sh for generating SWIG library manually
+## Prerequisites
 
-swig -python -c++ -extranative -outdir . src/stp_c.i 
+* [SWIG](https://github.com/swig/swig)
+* [CAF(C++ actor framework)](https://github.com/actor-framework/actor-framework)
+* [spdlog](https://github.com/gabime/spdlog)
+* CMake
+  
+## Building instructions 
 
-g++ -std=c++17 -Isrc -fPIC -c src/stp_c.cpp src/stp_c_wrap.cxx  $(pkg-config --cflags --libs python3)  -pthread
-
-g++ -std=c++17 -shared -fPIC -o _stp_c.so stp_c.o stp_c_wrap.o -pthread 
-
-python -c "import stp_c" #test
+```shell
+mkdir build && cd build
+cmake ..
+make -j
+ctest
+```
+For now there are no tests for CAF or MoodyCamel implementation, to see those in action: 
+```shell
+cd build/stp_caf && ./stp_caf
+cd build/stp_concurrent && ./stp_concurrent
+```
