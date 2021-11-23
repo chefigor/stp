@@ -102,6 +102,14 @@ void caf_main(actor_system &sys) {
   self->request(sw5, infinite, broadcast_atom_v);
   self->request(sw6, infinite, broadcast_atom_v);
   self->request(sw1, infinite, broadcast_atom_v);
+  std::this_thread::sleep_for(std::chrono::seconds(21));
+  self->send_exit(sw1,exit_reason::user_shutdown);
+  self->send_exit(sw2,exit_reason::user_shutdown);
+  self->send_exit(sw3,exit_reason::user_shutdown);
+  self->send_exit(sw4,exit_reason::user_shutdown);
+  self->send_exit(sw5,exit_reason::user_shutdown);
+  self->send_exit(sw6,exit_reason::user_shutdown);
+
 }
 
 CAF_MAIN(id_block::my_project)
