@@ -1,4 +1,4 @@
-add_executable(stp_caf src/stp_caf.cpp)
+add_library(stp_caf src/stp_caf.cpp)
 find_package(CAF REQUIRED)
 target_include_directories(stp_caf PRIVATE include)
 target_link_libraries(stp_caf PRIVATE CAF::core)
