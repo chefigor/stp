@@ -18,10 +18,10 @@ swig_link_libraries(stp _stp)
 
 find_package(Python REQUIRED)
 add_test(
-  NAME python-tests
+  NAME test_stp_python
   COMMAND ${Python_EXECUTABLE} -m unittest
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
 set_tests_properties(
-  python-tests
+  test_stp_python
   PROPERTIES ENVIRONMENT
              "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{PYTHONPATH}")

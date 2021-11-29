@@ -4,6 +4,8 @@ project(
   VERSION 1.0.0
   LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+
 cmake_policy(SET CMP0078 NEW)
 cmake_policy(SET CMP0086 NEW)
 
@@ -13,6 +15,14 @@ find_package(spdlog REQUIRED)
 add_subdirectory(stp_caf)
 add_subdirectory(stp_concurrent)
 add_subdirectory(stp)
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/3e0e32ba300ce8afe695ad3ba7e81b21b7cf237a.zip
+)
+
+FetchContent_MakeAvailable(googletest)
 
 include(cmake/CPM.cmake)
 

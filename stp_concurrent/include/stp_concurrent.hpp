@@ -14,6 +14,7 @@ class Switch {
   friend void link(Switch &a, Switch &b);
   void startSwitch();
   void stopSwitch();
+  uint32_t getRootId();
 
  private:
   void startSend();
