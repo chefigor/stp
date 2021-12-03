@@ -12,8 +12,8 @@ target_include_directories(stp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
                                        ${PYTHON_INCLUDE_DIRS})
 
 add_library(_stp SHARED src/stp.cpp)
+target_link_libraries(_stp PRIVATE spdlog::spdlog_header_only)
 target_compile_options(_stp PRIVATE -Werror -Wall -Wextra)
-target_compile_features(_stp PRIVATE cxx_std_17)
 swig_link_libraries(stp _stp)
 
 find_package(Python REQUIRED)

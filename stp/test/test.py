@@ -16,12 +16,12 @@ class TestBasic(unittest.TestCase):
 
         self.Switch = []
 
-        self.Switch.append(Switch("00:00:00:00:00:01"))
-        self.Switch.append(Switch("00:00:00:00:00:02"))
-        self.Switch.append(Switch("00:00:00:00:00:03"))
-        self.Switch.append(Switch("00:00:00:00:00:04"))
-        self.Switch.append(Switch("00:00:00:00:00:05"))
-        self.Switch.append(Switch("00:00:00:00:00:10"))
+        self.Switch.append(makeSwitch("00:00:00:00:00:01"))
+        self.Switch.append(makeSwitch("00:00:00:00:00:02"))
+        self.Switch.append(makeSwitch("00:00:00:00:00:03"))
+        self.Switch.append(makeSwitch("00:00:00:00:00:04"))
+        self.Switch.append(makeSwitch("00:00:00:00:00:05"))
+        self.Switch.append(makeSwitch("00:00:00:00:00:10"))
 
         link(self.Switch[0], self.Switch[1], LINK1000)
         link(self.Switch[0], self.Switch[2], LINK1000)
@@ -43,21 +43,20 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(self.Switch[5].getRootCost(), LINK16 + LINK100 + LINK1000)
 
     def test_switch(self):
-        a = Switch(5)
+        a = makeSwitch("00:00:00:00:00:05")
         self.assertEqual(a.getBridgeId(), 5)
         self.assertEqual(a.getRootCost(), 0)
         self.assertEqual(a.getRootId(), a.getBridgeId())
         self.assertEqual(a.getRootPath(), a.getBridgeId())
 
     def test_link(self):
-        a = Switch(2)
-        b = Switch(3)
+        a = makeSwitch("00:00:00:00:00:02")
+        b = makeSwitch("00:00:00:00:00:03")
         link(a, b, LINK100)
         a_neighbors = []
         b_neighbors = []
         at = False
         bt = False
-        print(b.getNeighbors())
         for tmp in b.getNeighbors():
             x = tmp.lock()
             if a.getBridgeId() == x.getBridgeId():

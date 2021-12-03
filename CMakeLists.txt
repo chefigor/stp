@@ -11,7 +11,11 @@ cmake_policy(SET CMP0086 NEW)
 
 include(CTest)
 
+set(VALGRIND_TEST CACHE STRING FALSE)
+find_program(VALGRIND "valgrind")
+
 find_package(spdlog REQUIRED)
+
 add_subdirectory(stp_caf)
 add_subdirectory(stp_concurrent)
 add_subdirectory(stp)
