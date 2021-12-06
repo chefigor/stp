@@ -19,3 +19,5 @@ make -j
 ```shell
 ctest
 ctest -T memcheck
+```
+Custom cmake target for valgrind tests enabled with option VALGRIN_TEST=true and results displayed in file helgrind.out 

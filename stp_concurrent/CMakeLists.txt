@@ -10,7 +10,7 @@ target_include_directories(test_concurrent PRIVATE include)
 target_link_libraries(test_concurrent PRIVATE stp_concurrent)
 target_link_libraries(test_concurrent PRIVATE gtest_main)
 if($CACHE{VALGRIND_TEST})
-  add_custom_command(TARGET test_concurrent POST_BUILD COMMAND "${VALGRIND}"  --tool=helgrind --log-file="filename"  $<TARGET_FILE:test_concurrent>) 
+  add_custom_command(TARGET test_concurrent POST_BUILD COMMAND "${VALGRIND}"  --tool=helgrind --log-file="helgrind.out"  $<TARGET_FILE:test_concurrent>) 
 endif()
 
 include(GoogleTest)
