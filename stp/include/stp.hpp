@@ -30,7 +30,7 @@ class Switch {
   uint32_t getRootCost() const;
   std::vector<std::weak_ptr<Switch>> getNeighbors() const;
   friend void link(const std::shared_ptr<Switch> &a,
-                   const std::shared_ptr<Switch> b, uint32_t cost);
+                   const std::shared_ptr<Switch> &b, uint32_t cost);
   void startSwitch();
   void stopSwitch();
 

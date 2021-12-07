@@ -18,7 +18,7 @@ uint64_t Switch::getRootId() const { return root_id; }
 uint64_t Switch::getRootPath() const { return root_path; }
 uint32_t Switch::getRootCost() const { return root_cost; }
 
-void link(const std::shared_ptr<Switch> &a, const std::shared_ptr<Switch> b,
+void link(const std::shared_ptr<Switch> &a, const std::shared_ptr<Switch> &b,
           uint32_t cost) {
   a->neighbors.emplace_back(b, cost);
   b->neighbors.emplace_back(a, cost);
