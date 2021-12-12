@@ -40,5 +40,3 @@ std::shared_ptr<Switch> makeSwitch(const std::string& str){return std::make_shar
 %include "stp.hpp"
 %template(SwitchVector)std::vector<std::weak_ptr<Switch>>;
 %template(SwitchWeakPtr) std::weak_ptr<Switch>;
-
-//%template (LinkVector) std::vector<Link>;
