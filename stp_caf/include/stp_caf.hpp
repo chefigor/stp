@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "caf/all.hpp"
 using namespace caf;
 
@@ -35,7 +36,7 @@ class network_switch : public switch_type::base {
  protected:
   behavior_type make_behavior() override {
     return {[=](get_atom) { return m_bridgeId; },
-            [=](get_rootID_atom){return m_rootId;},
+            [=](get_rootID_atom) { return m_rootId; },
             [=](link_atom, strong_actor_ptr sw, uint32_t port) {
               table.insert(std::make_pair(port, actor_cast<switch_type>(sw)));
             },

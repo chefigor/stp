@@ -2,7 +2,7 @@
 
 #include "stp_concurrent.hpp"
 
-TEST(test_concurrent,convergence) {
+TEST(test_concurrent, convergence) {
   Switch a(1000);
   Switch b(300);
   Switch c(400);
