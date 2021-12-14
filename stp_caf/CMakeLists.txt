@@ -5,10 +5,18 @@ target_link_libraries(stp_caf PRIVATE CAF::core)
 target_compile_options(stp_caf PRIVATE -Werror -Wall -Wextra)
 target_link_libraries(stp_caf PRIVATE spdlog::spdlog_header_only)
 
-add_executable(test_stp_caf test/test.cpp)
-target_include_directories(test_stp_caf PRIVATE include)
-target_link_libraries(test_stp_caf PRIVATE CAF::core CAF::test)
-if($CACHE{VALGRIND_TEST})
-  add_custom_command(TARGET test_stp_caf POST_BUILD COMMAND "${VALGRIND}"  --tool=helgrind --log-file="helgrind.out"  $<TARGET_FILE:test_concurrent>) 
-endif()
-add_test(test_caf test_stp_caf)
+add_executable(test_caf test/test.cpp)
+target_include_directories(test_caf PRIVATE include)
+target_link_libraries(test_caf PRIVATE CAF::core CAF::test)
+add_test(test_caf.convergence test_caf)
+
+add_test(
+  NAME memcheck_caf
+  COMMAND
+    ${VALGRIND} --tool=memcheck --xml=yes
+    --xml-file=${VALGRIND_PATH}/memcheck_caf.xml $<TARGET_FILE:test_caf>)
+add_test(
+  NAME helgrind_caf
+  COMMAND
+    ${VALGRIND} --tool=helgrind --xml=yes
+    --xml-file=${VALGRIND_PATH}/helgrind_caf.xml $<TARGET_FILE:test_caf>)

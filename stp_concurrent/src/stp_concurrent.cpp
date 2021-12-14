@@ -42,4 +42,4 @@ void Switch::stopSwitch() {
   sendTh.join();
   recvTh.join();
 }
-uint32_t Switch::getRootId(){return root_id;}
+uint32_t Switch::getRootId() { return root_id; }

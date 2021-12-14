@@ -10,8 +10,8 @@ cmake_policy(SET CMP0078 NEW)
 cmake_policy(SET CMP0086 NEW)
 
 include(CTest)
-
-set(VALGRIND_TEST CACHE STRING FALSE)
+set(VALGRIND_PATH "${CMAKE_BINARY_DIR}/valgrind")
+file(MAKE_DIRECTORY ${VALGRIND_PATH})
 find_program(VALGRIND "valgrind")
 
 find_package(spdlog REQUIRED)

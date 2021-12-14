@@ -33,8 +33,7 @@ void Switch::start() {
     for (auto &a : neighbors) {
       auto neighbor = a.sw.lock();
       if (!neighbor) continue;
-      std::scoped_lock<std::mutex, std::mutex> lock(neighbor->mutex,
-                                                    mutex);
+      std::scoped_lock<std::mutex, std::mutex> lock(neighbor->mutex, mutex);
       ++messages;
       if (neighbor->root_id < root_id) {
         root_id = neighbor->root_id;
@@ -48,8 +47,8 @@ void Switch::start() {
       spdlog::info(
           "Switch#{0:d} received rootID {1:d} from Switch#{2:d} :: value of "
           "rootID={3:d} , Root path = Switch#{4:d}",
-          bridge_id, neighbor->root_id, neighbor->bridge_id,
-          root_id, root_path);
+          bridge_id, neighbor->root_id, neighbor->bridge_id, root_id,
+          root_path);
     }
 
     std::this_thread::sleep_for(std::chrono::seconds(hello_timer));
